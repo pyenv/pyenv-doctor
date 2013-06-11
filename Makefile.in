@@ -1,0 +1,10 @@
+PREFIX = @prefix@
+
+.PHONY: install
+
+python:
+	echo '#!/bin/sh' > "$@"
+
+install: python
+	mkdir -p "$(PREFIX)/bin"
+	install -m 755 $< "$(PREFIX)/bin/python"

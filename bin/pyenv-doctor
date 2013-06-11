@@ -1,0 +1,178 @@
+#!/usr/bin/env bash
+#
+# Summary: Verify pyenv installation and deevlopment tools to build pythons.
+#
+# Usage: pyenv doctor [OPTIONS]
+#
+#   -a/--all       Check all
+#   -c/--cpython   Check for CPython
+#   -j/--jython    Check for Jython
+#   -p/--pypy      Check for PyPy
+#   -s/--stackless Check for Stackless Python
+#   -v/--verbose   Increase verbosity
+#
+
+set -e
+
+[ -n "$PYENV_DEBUG" ] && set -x
+
+if [ -z "$PYENV_ROOT" ]; then
+  PYENV_ROOT="${HOME}/.pyenv"
+fi
+
+parse_options() {
+  OPTIONS=()
+  ARGUMENTS=()
+  local arg option index
+
+  for arg in "$@"; do
+    if [ "${arg:0:1}" = "-" ]; then
+      if [ "${arg:1:1}" = "-" ]; then
+        OPTIONS[${#OPTIONS[*]}]="${arg:2}"
+      else
+        index=1
+        while option="${arg:$index:1}"; do
+          [ -n "$option" ] || break
+          OPTIONS[${#OPTIONS[*]}]="$option"
+          index=$(($index+1))
+        done
+      fi
+    else
+      ARGUMENTS[${#ARGUMENTS[*]}]="$arg"
+    fi
+  done
+}
+
+resolve_link() {
+  $(type -p greadlink readlink | head -1) "$1"
+}
+
+abs_dirname() {
+  local cwd="$(pwd)"
+  local path="$1"
+
+  while [ -n "$path" ]; do
+    cd "${path%/*}"
+    local name="${path##*/}"
+    path="$(resolve_link "$name" || true)"
+  done
+
+  pwd
+  cd "$cwd"
+}
+
+usage() {
+  { echo "usage: pyenv-doctor [-v|--verbose] [-a|--all] [-c|--cpython] [-j|--jython] [-p|--pypy] [-s|--stackless]"
+  } >&2
+  exit "${1:-1}"
+}
+
+unset WITH_ALL
+unset WITH_CPYTHON
+unset WITH_JYTHON
+unset WITH_PYPY
+unset WITH_STACKLESS
+PYENV_DOCTOR_ROOT="$(abs_dirname "$0")/.."
+unset VERBOSE
+
+parse_options "$@"
+
+for option in "${OPTIONS[@]}"; do
+  case "$option" in
+  "a" | "all" )
+    WITH_ALL=true
+    ;;
+  "c" | "cpython" )
+    WITH_CPYTHON=true
+    ;;
+  "h" | "help" )
+    usage 0
+    ;;
+  "j" | "jython" )
+    WITH_JYTHON=true
+    ;;
+  "p" | "pypy" )
+    WITH_PYPY=true
+    ;;
+  "s" | "stackless" )
+    WITH_STACKLESS=true
+    ;;
+  "v" | "verbose" )
+    VERBOSE="-v"
+    ;;
+  esac
+done
+
+if [ -z "$TMPDIR" ]; then
+  TMP="/tmp"
+else
+  TMP="${TMPDIR%/}"
+fi
+
+SEED="$(date "+%Y%m%d%H%M%S").$$"
+BUILD_PATH="${TMP}/pyenv-doctor.${SEED}"
+
+if ! command -v git 1>/dev/null 2>&1; then
+  echo "pyenv: git is not installed." 1>&2
+  exit 1
+fi
+
+if ! command -v python-build 1>/dev/null 2>&1; then
+  echo "pyenv: python-build is not installed." 1>&2
+  exit 1
+fi
+
+DEFINITION="${BUILD_PATH}/definition"
+PREFIX="${BUILD_PATH}/prefix"
+REPOSITORY="${PYENV_DOCTOR_ROOT}"
+BRANCH="$(cd "${PYENV_DOCTOR_ROOT}" && git name-rev --name-only HEAD)"
+mkdir -p "${BUILD_PATH}"
+cat <<EOF > "${DEFINITION}"
+install_git "pyenv-doctor" "${REPOSITORY}" "${BRANCH}" standard
+EOF
+
+# if none is selected, check as WITH_CPYTHON
+if [ -z "${WITH_JYTHON}" ] && [ -z "${WITH_PYPY}" ] && [ -z "${WITH_STACKLESS}" ]; then
+  WITH_CPYTHON=true
+fi
+
+if [ -n "${WITH_ALL}" ] || [ -n "${WITH_CPYTHON}" ]; then
+  export CONFIGURE_OPTS+="--with-cpython"
+fi
+if [ -n "${WITH_ALL}" ] || [ -n "${WITH_JYTHON}" ]; then
+  export CONFIGURE_OPTS+="--with-jython"
+fi
+if [ -n "${WITH_ALL}" ] || [ -n "${WITH_PYPY}" ]; then
+  export CONFIGURE_OPTS+="--with-pypy"
+fi
+if [ -n "${WITH_ALL}" ] || [ -n "${WITH_STACKLESS}" ]; then
+  export CONFIGURE_OPTS+="--with-stackless"
+fi
+
+case "$(uname -s)" in
+"Darwin" )
+  ## ld(1) on Mac OS X searches /usr/lib first of /usr/local/lib.
+  ## to override system libraries installed in /usr/lib,
+  ## we must explicitly specify the library path in "-L".
+  if command -v brew 1>/dev/null 2>&1; then # Homebrew
+    [ -d "/usr/local/include" ] && export CFLAGS+="-I/usr/local/include"
+    [ -d "/usr/local/lib" ] && export LDFLAGS+="-L/usr/local/lib"
+  fi
+  ;;
+esac
+
+STATUS=0
+python-build $VERBOSE "${DEFINITION}" "${PREFIX}" || STATUS="$?"
+
+if [ "${STATUS}" == "0" ]; then
+  echo -e "\033[0;32mCongratulations! You are ready to build pythons!\033[0m"
+else
+  { echo -e "\033[0;31mProblem(s) detected while checking system.\033[0m"
+    echo -e "\033[0;31m\033[0m"
+    echo -e "\033[0;31mSee https://github.com/yyuu/pyenv/wiki/Common-build-problems for known solutions.\033[0m"
+  } 1>&2
+fi
+
+rm -fr "${BUILD_PATH}"
+
+exit "${STATUS}"
