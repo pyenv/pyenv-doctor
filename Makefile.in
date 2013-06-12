@@ -8,3 +8,6 @@ python:
 install: python
 	mkdir -p "$(PREFIX)/bin"
 	install -m 755 $< "$(PREFIX)/bin/python"
+
+clean:
+	rm -f python
