@@ -137,16 +137,16 @@ if [ -z "${WITH_JYTHON}" ] && [ -z "${WITH_PYPY}" ] && [ -z "${WITH_STACKLESS}" 
 fi
 
 if [ -n "${WITH_ALL}" ] || [ -n "${WITH_CPYTHON}" ]; then
-  export CONFIGURE_OPTS+="--with-cpython"
+  export CONFIGURE_OPTS="--with-cpython $CONFIGURE_OPTS"
 fi
 if [ -n "${WITH_ALL}" ] || [ -n "${WITH_JYTHON}" ]; then
-  export CONFIGURE_OPTS+="--with-jython"
+  export CONFIGURE_OPTS="--with-jython $CONFIGURE_OPTS"
 fi
 if [ -n "${WITH_ALL}" ] || [ -n "${WITH_PYPY}" ]; then
-  export CONFIGURE_OPTS+="--with-pypy"
+  export CONFIGURE_OPTS="--with-pypy $CONFIGURE_OPTS"
 fi
 if [ -n "${WITH_ALL}" ] || [ -n "${WITH_STACKLESS}" ]; then
-  export CONFIGURE_OPTS+="--with-stackless"
+  export CONFIGURE_OPTS="--with-stackless $CONFIGURE_OPTS"
 fi
 
 case "$(uname -s)" in
@@ -155,8 +155,8 @@ case "$(uname -s)" in
   ## to override system libraries installed in /usr/lib,
   ## we must explicitly specify the library path in "-L".
   if command -v brew 1>/dev/null 2>&1; then # Homebrew
-    [ -d "/usr/local/include" ] && export CFLAGS+="-I/usr/local/include"
-    [ -d "/usr/local/lib" ] && export LDFLAGS+="-L/usr/local/lib"
+    [ -d "/usr/local/include" ] && export CPPFLAGS="-I/usr/local/include $CPPFLAGS"
+    [ -d "/usr/local/lib" ] && export LDFLAGS="-L/usr/local/lib $LDFLAGS"
   fi
   ;;
 esac
