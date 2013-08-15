@@ -128,7 +128,7 @@ REPOSITORY="${PYENV_DOCTOR_ROOT}"
 BRANCH="$(cd "${PYENV_DOCTOR_ROOT}" && git name-rev --name-only HEAD)"
 mkdir -p "${BUILD_PATH}"
 cat <<EOF > "${DEFINITION}"
-install_git "pyenv-doctor" "${REPOSITORY}" "${BRANCH}" standard
+install_git "python-pyenv-doctor" "${REPOSITORY}" "${BRANCH}" standard
 EOF
 
 # if none is selected, check as WITH_CPYTHON
