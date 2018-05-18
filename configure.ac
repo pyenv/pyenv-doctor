@@ -36,7 +36,10 @@ if ( test -n "$WITH_CPYTHON" || test -n "$WITH_PYPY" || test -n "$WITH_STACKLESS
   ## OpenSSL
   AC_CHECK_LIB(ssl, SSL_library_init, [HAVE_LIBSSL=yes], [HAVE_LIBSSL=no])
   if test "$HAVE_LIBSSL" = "no"; then
-    AC_MSG_ERROR([OpenSSL is not installed.])
+    AC_CHECK_LIB(ssl, OPENSSL_init_ssl, [HAVE_LIBSSL=yes], [HAVE_LIBSSL=no])
+    if test "$HAVE_LIBSSL" = "no"; then
+      AC_MSG_ERROR([OpenSSL is not installed.])
+    fi
   fi
   AC_CHECK_HEADERS(openssl/ssl.h, [HAVE_SSL_H=yes], [HAVE_SSL_H=no])
   if test "$HAVE_SSL_H" = "no"; then
