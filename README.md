@@ -1,6 +1,6 @@
 # pyenv-doctor
 
-pyenv-doctor is a [pyenv](https://github.com/yyuu/pyenv) plugin
+pyenv-doctor is a [pyenv](https://github.com/pyenv/pyenv) plugin
 that provides a `pyenv doctor` command to verify pyenv installation
 and development tools to build pythons.
 
@@ -11,7 +11,7 @@ and development tools to build pythons.
 Installing pyenv-doctor as a pyenv plugin will give you access to the
 `pyenv doctor` command.
 
-    $ git clone git://github.com/yyuu/pyenv-doctor.git ~/.pyenv/plugins/pyenv-doctor
+    $ git clone git://github.com/pyenv/pyenv-doctor.git $(pyenv root)/plugins/pyenv-doctor
 
 ## Usage
 
