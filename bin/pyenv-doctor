@@ -169,7 +169,7 @@ if [ "${STATUS}" == "0" ]; then
 else
   { echo -e "\033[0;31mProblem(s) detected while checking system.\033[0m"
     echo -e "\033[0;31m\033[0m"
-    echo -e "\033[0;31mSee https://github.com/yyuu/pyenv/wiki/Common-build-problems for known solutions.\033[0m"
+    echo -e "\033[0;31mSee https://github.com/pyenv/pyenv/wiki/Common-build-problems for known solutions.\033[0m"
   } 1>&2
 fi
 
