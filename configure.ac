@@ -28,7 +28,7 @@ if ( test -n "$WITH_CPYTHON" || test -n "$WITH_PYPY" || test -n "$WITH_STACKLESS
   if test "$HAVE_LIBREADLINE" = "no"; then
     AC_MSG_ERROR([GNU readline is not installed.])
   fi
-  AC_CHECK_HEADERS(readline/readline.h, readline/rlconf.h, [HAVE_READLINE_H=yes], [HAVE_READLINE_H=no])
+  AC_CHECK_HEADERS([readline/readline.h, readline/rlconf.h], [HAVE_READLINE_H=yes], [HAVE_READLINE_H=no], [])
   if test "$HAVE_READLINE_H" = "no"; then
     AC_MSG_ERROR([GNU readline development header is not installed.])
   fi
@@ -36,6 +36,7 @@ if ( test -n "$WITH_CPYTHON" || test -n "$WITH_PYPY" || test -n "$WITH_STACKLESS
   ## OpenSSL
   AC_CHECK_LIB(ssl, SSL_library_init, [HAVE_LIBSSL=yes], [HAVE_LIBSSL=no])
   if test "$HAVE_LIBSSL" = "no"; then
+    AC_MSG_WARN([OpenSSL <1.1 not installed. Checking v1.1 or beyond...])
     AC_CHECK_LIB(ssl, OPENSSL_init_ssl, [HAVE_LIBSSL=yes], [HAVE_LIBSSL=no])
     if test "$HAVE_LIBSSL" = "no"; then
       AC_MSG_ERROR([OpenSSL is not installed.])
