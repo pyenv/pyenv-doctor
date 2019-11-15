@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Summary: Verify pyenv installation and deevlopment tools to build pythons.
+# Summary: Verify pyenv installation and development tools to build pythons.
 #
 # Usage: pyenv doctor [OPTIONS]
 #
