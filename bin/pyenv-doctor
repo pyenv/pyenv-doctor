@@ -151,12 +151,20 @@ fi
 
 case "$(uname -s)" in
 "Darwin" )
-  ## ld(1) on Mac OS X searches /usr/lib first of /usr/local/lib.
-  ## to override system libraries installed in /usr/lib,
+  ## ld(1) on Mac OS X searches /usr/lib first of Homebrew's lib.
+  ## to override system libraries installed by Homebrew,
   ## we must explicitly specify the library path in "-L".
   if command -v brew 1>/dev/null 2>&1; then # Homebrew
-    [ -d "/usr/local/include" ] && export CPPFLAGS="-I/usr/local/include $CPPFLAGS"
-    [ -d "/usr/local/lib" ] && export LDFLAGS="-L/usr/local/lib $LDFLAGS"
+    # According to https://docs.brew.sh/Installation,
+    # "/usr/local" is for Intel binaries,
+    # "/opt/homebrew" for ARM.
+    if [ "$(uname -m)" = arm64 ]; then
+      [ -d "/opt/homebrew/include" ] && export CPPFLAGS="-I/opt/homebrew/include $CPPFLAGS"
+      [ -d "/opt/homebrew/lib" ] && export LDFLAGS="-L/opt/homebrew/lib $LDFLAGS"
+    else
+      [ -d "/usr/local/include" ] && export CPPFLAGS="-I/usr/local/include $CPPFLAGS"
+      [ -d "/usr/local/lib" ] && export LDFLAGS="-L/usr/local/lib $LDFLAGS"
+    fi
   fi
   ;;
 esac
