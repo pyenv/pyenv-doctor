@@ -155,16 +155,10 @@ case "$(uname -s)" in
   ## to override system libraries installed by Homebrew,
   ## we must explicitly specify the library path in "-L".
   if command -v brew 1>/dev/null 2>&1; then # Homebrew
-    # According to https://docs.brew.sh/Installation,
-    # "/usr/local" is for Intel binaries,
-    # "/opt/homebrew" for ARM.
-    if [ "$(uname -m)" = arm64 ]; then
-      [ -d "/opt/homebrew/include" ] && export CPPFLAGS="-I/opt/homebrew/include $CPPFLAGS"
-      [ -d "/opt/homebrew/lib" ] && export LDFLAGS="-L/opt/homebrew/lib $LDFLAGS"
-    else
-      [ -d "/usr/local/include" ] && export CPPFLAGS="-I/usr/local/include $CPPFLAGS"
-      [ -d "/usr/local/lib" ] && export LDFLAGS="-L/usr/local/lib $LDFLAGS"
-    fi
+    [ -d "$(brew --prefix)/include" ] && export CPPFLAGS="-I$(brew --prefix)/include $CPPFLAGS"
+    [ -d "$(brew --prefix openssl)/include" ] && export CPPFLAGS="-I$(brew --prefix openssl)/include $CPPFLAGS"
+    [ -d "$(brew --prefix)/lib" ] && export LDFLAGS="-L$(brew --prefix)/lib $LDFLAGS"
+    [ -d "$(brew --prefix openssl)/lib" ] && export LDFLAGS="-L$(brew --prefix openssl)/lib $LDFLAGS"
   fi
   ;;
 esac
