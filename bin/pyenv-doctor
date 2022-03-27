@@ -157,8 +157,10 @@ case "$(uname -s)" in
   if command -v brew 1>/dev/null 2>&1; then # Homebrew
     [ -d "$(brew --prefix)/include" ] && export CPPFLAGS="-I$(brew --prefix)/include $CPPFLAGS"
     [ -d "$(brew --prefix openssl)/include" ] && export CPPFLAGS="-I$(brew --prefix openssl)/include $CPPFLAGS"
+    [ -d "$(brew --prefix openssl@1.1)/include" ] && export CPPFLAGS="-I$(brew --prefix openssl@1.1)/include $CPPFLAGS"
     [ -d "$(brew --prefix)/lib" ] && export LDFLAGS="-L$(brew --prefix)/lib $LDFLAGS"
     [ -d "$(brew --prefix openssl)/lib" ] && export LDFLAGS="-L$(brew --prefix openssl)/lib $LDFLAGS"
+    [ -d "$(brew --prefix openssl@1.1)/lib" ] && export LDFLAGS="-L$(brew --prefix openssl@1.1)/lib $LDFLAGS"
   fi
   ;;
 esac
