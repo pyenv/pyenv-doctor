@@ -11,7 +11,7 @@ and development tools to build pythons.
 Installing pyenv-doctor as a pyenv plugin will give you access to the
 `pyenv doctor` command.
 
-    $ git clone git://github.com/pyenv/pyenv-doctor.git $(pyenv root)/plugins/pyenv-doctor
+    $ git clone https://github.com/pyenv/pyenv-doctor.git $(pyenv root)/plugins/pyenv-doctor
 
 ## Usage
 
