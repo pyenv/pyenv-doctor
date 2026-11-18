@@ -177,6 +177,23 @@ else
   } 1>&2
 fi
 
+# LD_LIBRARY_PATH, LD_PRELOAD, DYLD_* and the like are picked up by the
+# dynamic linker and can break importing extension modules in installed Pythons.
+LINKER_ENVVARS=()
+for name in $(compgen -e); do
+  case "$name" in
+  LD_* | DYLD_* )
+    LINKER_ENVVARS[${#LINKER_ENVVARS[*]}]="$name"
+    ;;
+  esac
+done
+if [ "${#LINKER_ENVVARS[*]}" -gt 0 ]; then
+  { echo -e "\033[0;33mWarning: these environment variables affect the dynamic linker:\033[0m"
+    printf '\033[0;33m  %s\033[0m\n' "${LINKER_ENVVARS[@]}"
+    echo -e "\033[0;33mThey can break importing modules in Pythons installed by pyenv.\033[0m"
+  } 1>&2
+fi
+
 rm -fr "${BUILD_PATH}"
 
 exit "${STATUS}"
