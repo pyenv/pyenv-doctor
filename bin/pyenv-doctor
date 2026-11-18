@@ -168,15 +168,6 @@ esac
 STATUS=0
 python-build $VERBOSE "${DEFINITION}" "${PREFIX}" || STATUS="$?"
 
-if [ "${STATUS}" == "0" ]; then
-  echo -e "\033[0;32mCongratulations! You are ready to build pythons!\033[0m"
-else
-  { echo -e "\033[0;31mProblem(s) detected while checking system.\033[0m"
-    echo -e "\033[0;31m\033[0m"
-    echo -e "\033[0;31mSee https://github.com/pyenv/pyenv/wiki/Common-build-problems for known solutions.\033[0m"
-  } 1>&2
-fi
-
 LINKER_ENVVARS=()
 for name in $(compgen -e); do
   case "$name" in
@@ -190,6 +181,17 @@ if [ "${#LINKER_ENVVARS[*]}" -gt 0 ]; then
     printf '\033[0;33m  %s\033[0m\n' "${LINKER_ENVVARS[@]}"
     echo -e "\033[0;33mThey might cause Pyenv-managed Pythons to load wrong dependent libraries.\033[0m"
   } 1>&2
+fi
+
+if [ "${STATUS}" != "0" ]; then
+  { echo -e "\033[0;31mProblem(s) detected while checking system.\033[0m"
+    echo -e "\033[0;31m\033[0m"
+    echo -e "\033[0;31mSee https://github.com/pyenv/pyenv/wiki/Common-build-problems for known solutions.\033[0m"
+  } 1>&2
+elif [ "${#LINKER_ENVVARS[*]}" -gt 0 ]; then
+  echo -e "\033[0;33mYou can build pythons, but see the warning above.\033[0m"
+else
+  echo -e "\033[0;32mCongratulations! You are ready to build pythons!\033[0m"
 fi
 
 rm -fr "${BUILD_PATH}"
